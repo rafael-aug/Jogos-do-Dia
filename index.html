@@ -1,569 +1,470 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Jogos de Hoje - Agenda & Transmissões</title>
-  
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0b0f17">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="JogosHoje">
-  <link rel="apple-touch-icon" href="icon-192.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Placar do Dia</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#090D14">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #090D14;
+    --bg-2: #0D1420;
+    --surface: #121A28;
+    --surface-2: #182236;
+    --line: #23324A;
+    --line-soft: #1A2536;
+    --ink: #F1F3F7;
+    --ink-dim: #8496B0;
+    --ink-faint: #52627C;
+    --amber: #F0A947;
+    --amber-dim: #7A5A28;
+    --red: #E15C5C;
+    --violet: #9C86F5;
+    --teal: #35C4A8;
+    --orange: #FF9552;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+  body{
+    background:
+      radial-gradient(900px 420px at 50% -8%, rgba(240,169,71,0.10) 0%, transparent 60%),
+      radial-gradient(700px 500px at 100% 0%, rgba(156,134,245,0.06) 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding-bottom:48px;
+  }
+  .wrap{max-width:480px; margin:0 auto; padding:0 16px;}
 
-  <!-- Fonte Google Plus Jakarta Sans -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  /* ===== Header / scoreboard hero ===== */
+  header{
+    padding:36px 16px 22px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  header::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:1px;
+    background:linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+  }
+  .eyebrow{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    margin-bottom:10px;
+  }
+  .pulse{
+    width:7px; height:7px;
+    border-radius:50%;
+    background:var(--amber);
+    box-shadow:0 0 0 0 rgba(240,169,71,.6);
+    animation:pulse 2.2s infinite;
+    flex-shrink:0;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(240,169,71,.55);}
+    70%{box-shadow:0 0 0 8px rgba(240,169,71,0);}
+    100%{box-shadow:0 0 0 0 rgba(240,169,71,0);}
+  }
+  .board-date{
+    font-family:'Bebas Neue', sans-serif;
+    font-weight:400;
+    font-size:56px;
+    line-height:.95;
+    letter-spacing:.02em;
+    color:var(--ink);
+    text-transform:uppercase;
+  }
+  .board-date .accent{color:var(--amber);}
+  .board-sub{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--ink-faint);
+    margin-top:8px;
+    letter-spacing:.03em;
+  }
 
-  <style>
-    :root {
-      --bg-dark: #0b0f17;
-      --bg-card: #151c28;
-      --bg-card-hover: #1c2536;
-      --card-border: rgba(255, 255, 255, 0.08);
-      --accent-primary: #3b82f6;
-      --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
-      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
-      --radius-lg: 18px;
-      --radius-md: 12px;
-      --radius-sm: 8px;
-    }
+  /* ===== Tabs ===== */
+  nav.tabs{
+    display:flex;
+    gap:2px;
+    padding:20px 0 18px;
+    max-width:480px;
+    margin:0 auto;
+    overflow-x:auto;
+    scrollbar-width:none;
+    border-bottom:1px solid var(--line-soft);
+  }
+  nav.tabs::-webkit-scrollbar{display:none;}
+  nav.tabs button{
+    flex:0 0 auto;
+    min-width:78px;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:12.5px;
+    letter-spacing:.01em;
+    background:transparent;
+    color:var(--ink-faint);
+    border:none;
+    border-bottom:2px solid transparent;
+    padding:8px 12px 12px;
+    cursor:pointer;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  nav.tabs button:focus-visible{outline:2px solid var(--amber); outline-offset:2px; border-radius:4px;}
+  nav.tabs button.active{color:var(--ink); border-bottom-color:var(--amber);}
+  .tab-count{
+    display:block;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    color:var(--ink-faint);
+    margin-top:3px;
+    font-weight:500;
+  }
+  nav.tabs button.active .tab-count{color:var(--amber);}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
+  section.panel{display:none; padding-top:16px;}
+  section.panel.active{display:block; animation:rise .35s ease both;}
+  @keyframes rise{
+    from{opacity:0; transform:translateY(6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
 
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-bottom: 40px;
-    }
+  /* ===== Ticket-style match card ===== */
+  .match-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    margin-bottom:14px;
+    overflow:hidden;
+    box-shadow:0 8px 24px -12px rgba(0,0,0,.55);
+  }
+  .card-top{
+    padding:16px 18px 14px;
+  }
+  .match-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .kickoff{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size:16px;
+    color:var(--ink);
+    letter-spacing:.02em;
+  }
+  .kickoff::before{content:"⏱ "; font-size:12px; opacity:.6;}
+  .comp-tag{
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:10px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+  }
 
-    /* Top Bar Header */
-    header {
-      width: 100%;
-      background: rgba(11, 15, 23, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      border-bottom: 1px solid var(--card-border);
-      display: flex;
-      justify-content: center;
-    }
+  .teams{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+  }
+  .team{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    width:40%;
+    text-align:center;
+  }
+  .crest{
+    width:56px; height:56px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Bebas Neue', sans-serif;
+    font-size:19px;
+    letter-spacing:.02em;
+    color:#fff;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.14), 0 4px 14px -4px rgba(0,0,0,.6);
+  }
+  .team-name{font-size:12.5px; font-weight:600; line-height:1.3; color:var(--ink);}
+  .vs{
+    font-family:'Bebas Neue', sans-serif;
+    color:var(--ink-faint);
+    font-size:22px;
+    padding-bottom:20px;
+  }
 
-    .header-content {
-      width: 100%;
-      max-width: 1200px;
-      padding: 14px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+  /* perforation */
+  .perf{
+    position:relative;
+    height:0;
+    border-top:1.5px dashed var(--line);
+    margin:0 -1px;
+  }
+  .perf::before, .perf::after{
+    content:"";
+    position:absolute;
+    top:-9px;
+    width:18px; height:18px;
+    border-radius:50%;
+    background:var(--bg);
+    box-shadow:0 0 0 1px var(--line) inset;
+  }
+  .perf::before{left:-9px;}
+  .perf::after{right:-9px;}
 
-    .brand-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+  .broadcast{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    padding:14px 18px 16px;
+    background:var(--surface-2);
+  }
+  .chan{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    font-weight:500;
+    background:var(--bg-2);
+    color:var(--ink);
+    padding:5px 10px;
+    border-radius:7px;
+    border:1px solid var(--line);
+  }
 
-    .brand-icon {
-      width: 40px;
-      height: 40px;
-      background: var(--accent-gradient);
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
-    }
+  .match-card.serieb .kickoff{color:var(--red);}
+  .match-card.liberta .kickoff{color:var(--violet);}
+  .match-card.copabrasil .kickoff{color:var(--teal);}
+  .match-card.nba .kickoff{color:var(--orange);}
 
-    .brand-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+  /* ===== Empty state ===== */
+  .empty{
+    background:var(--surface);
+    border:1px dashed var(--line);
+    border-radius:16px;
+    padding:40px 24px;
+    text-align:center;
+  }
+  .empty .ball{font-size:26px; margin-bottom:10px; opacity:.5;}
+  .empty .big{
+    font-family:'Inter', sans-serif;
+    font-size:16px;
+    font-weight:700;
+    margin-bottom:8px;
+    color:var(--ink);
+  }
+  .empty .small{
+    font-size:13px;
+    color:var(--ink-dim);
+    line-height:1.65;
+  }
+  .empty .small b{color:var(--amber); font-weight:600;}
 
-    .date-pill {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .install-btn {
-      background: rgba(59, 130, 246, 0.15);
-      color: #60a5fa;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: none;
-    }
-
-    .install-btn:hover {
-      background: var(--accent-primary);
-      color: #ffffff;
-    }
-
-    /* Busca e Filtros */
-    .hero-bar {
-      width: 100%;
-      max-width: 1200px;
-      padding: 24px 20px 12px 20px;
-    }
-
-    .search-box {
-      width: 100%;
-      position: relative;
-    }
-
-    .search-input {
-      width: 100%;
-      background: var(--bg-card);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: 14px 16px 14px 44px;
-      color: var(--text-main);
-      font-size: 0.95rem;
-      outline: none;
-      transition: all 0.2s ease;
-    }
-
-    .search-input:focus {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-dim);
-    }
-
-    .tabs-wrapper {
-      width: 100%;
-      max-width: 1200px;
-      padding: 0 20px;
-      margin-bottom: 20px;
-    }
-
-    .tabs-container {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      padding-bottom: 4px;
-    }
-
-    .tabs-container::-webkit-scrollbar { display: none; }
-
-    .tab-btn {
-      background: var(--bg-card);
-      color: var(--text-muted);
-      border: 1px solid var(--card-border);
-      padding: 10px 18px;
-      border-radius: 30px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .tab-btn.active {
-      background: var(--accent-gradient);
-      color: #ffffff;
-      border-color: transparent;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
-
-    /* Grid Responsivo */
-    main {
-      width: 100%;
-      max-width: 1200px;
-      padding: 0 20px;
-    }
-
-    .matches-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    @media (min-width: 768px) {
-      .matches-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (min-width: 1024px) {
-      .matches-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-
-    /* Card de Jogo */
-    .match-card {
-      background: var(--bg-card);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-lg);
-      padding: 18px;
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .match-card:hover {
-      transform: translateY(-3px);
-      border-color: rgba(255, 255, 255, 0.18);
-      box-shadow: var(--shadow-md);
-      background: var(--bg-card-hover);
-    }
-
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .league-badge {
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 5px 10px;
-      border-radius: 20px;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-
-    .tag-libertadores { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.25); }
-    .tag-sulamericana { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.25); }
-    .tag-serie-b { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25); }
-    .tag-champions { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.25); }
-
-    .match-time-badge {
-      font-size: 0.8rem;
-      font-weight: 800;
-      color: #38bdf8;
-      background: rgba(56, 189, 248, 0.1);
-      padding: 4px 10px;
-      border-radius: 12px;
-    }
-
-    .teams-section {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 10px 0 18px 0;
-    }
-
-    .team-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      text-align: center;
-    }
-
-    .logo-wrapper {
-      width: 56px;
-      height: 56px;
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 50%;
-      padding: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .team-logo {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
-    }
-
-    /* Escudo reserva elegante com iniciais caso a imagem falhe */
-    .team-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: var(--accent-gradient);
-      color: #ffffff;
-      font-weight: 800;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    }
-
-    .team-name {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: var(--text-main);
-      line-height: 1.25;
-      max-width: 100px;
-    }
-
-    .vs-text {
-      font-size: 0.75rem;
-      font-weight: 900;
-      color: var(--text-dim);
-      padding: 0 12px;
-    }
-
-    .broadcast-box {
-      background: rgba(0, 0, 0, 0.25);
-      border-radius: var(--radius-md);
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.03);
-    }
-
-    .tv-label {
-      font-size: 0.72rem;
-      color: var(--text-dim);
-      font-weight: 600;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .channels-flex {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .channel-tag {
-      background: rgba(255, 255, 255, 0.08);
-      color: #e2e8f0;
-      font-size: 0.72rem;
-      font-weight: 600;
-      padding: 3px 8px;
-      border-radius: var(--radius-sm);
-    }
-
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-muted);
-      background: var(--bg-card);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--card-border);
-    }
-
-    footer {
-      margin-top: 40px;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-dim);
-    }
-  </style>
+  .notice{
+    margin-top:28px;
+    font-size:11px;
+    color:var(--ink-faint);
+    text-align:center;
+    line-height:1.7;
+    padding:0 10px;
+  }
+  .notice b{color:var(--ink-dim);}
+</style>
 </head>
 <body>
 
-  <header>
-    <div class="header-content">
-      <div class="brand-logo">
-        <div class="brand-icon">⚽</div>
-        <div>
-          <div class="brand-title">Jogos de Hoje</div>
-          <div class="date-pill" id="current-date">Carregando...</div>
+<header>
+  <div class="eyebrow"><span class="pulse"></span>Brasil · Horário de Brasília</div>
+  <div class="board-date">QUA <span class="accent">19</span> AGO</div>
+  <div class="board-sub">SÉRIE A · SÉRIE B · LIBERTADORES · COPA DO BRASIL · NBA</div>
+</header>
+
+<div class="wrap">
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="a">Série A<span class="tab-count">0</span></button>
+    <button class="tab-btn" data-tab="b">Série B<span class="tab-count">5</span></button>
+    <button class="tab-btn" data-tab="liberta">Liberta<span class="tab-count">3</span></button>
+    <button class="tab-btn" data-tab="copabr">Copa BR<span class="tab-count">0</span></button>
+    <button class="tab-btn" data-tab="nba">NBA<span class="tab-count">0</span></button>
+  </nav>
+
+  <section class="panel active" id="panel-a">
+    <div class="empty">
+      <div class="ball">⚽</div>
+      <div class="big">Sem jogos da Série A hoje</div>
+      <div class="small">O Brasileirão Série A não tem rodada no meio desta semana. Próxima rodada <b>sábado, 22/08</b>.</div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-b">
+
+    <div class="match-card serieb">
+      <div class="card-top">
+        <div class="match-top"><span class="kickoff">19:30</span><span class="comp-tag">Série B · Rodada 22</span></div>
+        <div class="teams">
+          <div class="team"><div class="crest" style="background:#003399">FOR</div><div class="team-name">Fortaleza</div></div>
+          <div class="vs">×</div>
+          <div class="team"><div class="crest" style="background:#3A3A3A">SBE</div><div class="team-name">São Bernardo</div></div>
         </div>
       </div>
-      <button class="install-btn" id="pwa-install-btn">📲 Instalar App</button>
+      <div class="perf"></div>
+      <div class="broadcast"><span class="chan">XSports</span><span class="chan">SportyNet</span><span class="chan">ESPN4</span></div>
     </div>
-  </header>
 
-  <section class="hero-bar">
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="search-input" class="search-input" placeholder="Buscar por time, campeonato ou canal..." oninput="handleSearch()">
+    <div class="match-card serieb">
+      <div class="card-top">
+        <div class="match-top"><span class="kickoff">19:30</span><span class="comp-tag">Série B · Rodada 22</span></div>
+        <div class="teams">
+          <div class="team"><div class="crest" style="background:#0A4A2E">AVA</div><div class="team-name">Avaí</div></div>
+          <div class="vs">×</div>
+          <div class="team"><div class="crest" style="background:#B01E28">SPO</div><div class="team-name">Sport Recife</div></div>
+        </div>
+      </div>
+      <div class="perf"></div>
+      <div class="broadcast"><span class="chan">Disney+</span></div>
+    </div>
+
+    <div class="match-card serieb">
+      <div class="card-top">
+        <div class="match-top"><span class="kickoff">20:30</span><span class="comp-tag">Série B · Rodada 22</span></div>
+        <div class="teams">
+          <div class="team"><div class="crest" style="background:#00723F">CUI</div><div class="team-name">Cuiabá</div></div>
+          <div class="vs">×</div>
+          <div class="team"><div class="crest" style="background:#0B5FA5">OPE</div><div class="team-name">Operário-PR</div></div>
+        </div>
+      </div>
+      <div class="perf"></div>
+      <div class="broadcast"><span class="chan">Disney+</span></div>
+    </div>
+
+    <div class="match-card serieb">
+      <div class="card-top">
+        <div class="match-top"><span class="kickoff">20:30</span><span class="comp-tag">Série B · Rodada 22</span></div>
+        <div class="teams">
+          <div class="team"><div class="crest" style="background:#7A1E1E">VIL</div><div class="team-name">Vila Nova</div></div>
+          <div class="vs">×</div>
+          <div class="team"><div class="crest" style="background:#111726">PON</div><div class="team-name">Ponte Preta</div></div>
+        </div>
+      </div>
+      <div class="perf"></div>
+      <div class="broadcast"><span class="chan">Disney+</span></div>
+    </div>
+
+    <div class="match-card serieb">
+      <div class="card-top">
+        <div class="match-top"><span class="kickoff">21:30</span><span class="comp-tag">Série B · Rodada 22</span></div>
+        <div class="teams">
+          <div class="team"><div class="crest" style="background:#B01E28">BFC</div><div class="team-name">Botafogo-SP</div></div>
+          <div class="vs">×</div>
+          <div class="team"><div class="crest" style="background:#C79A00">CRI</div><div class="team-name">Criciúma</div></div>
+        </div>
+      </div>
+      <div class="perf"></div>
+      <div class="broadcast"><span class="chan">ESPN4</span></div>
+    </div>
+
+  </section>
+
+  <section class="panel" id="panel-liberta">
+
+    <div class="match-card liberta">
+      <div class="card-top">
+        <div class="match-top"><span class="kickoff">19:00</span><span class="comp-tag">Libertadores · Oitavas (volta)</span></div>
+        <div class="teams">
+          <div class="team"><div class="crest" style="background:#001B4E">CPO</div><div class="team-name">Cerro Porteño</div></div>
+          <div class="vs">×</div>
+          <div class="team"><div class="crest" style="background:#0A6C2E">PAL</div><div class="team-name">Palmeiras</div></div>
+        </div>
+      </div>
+      <div class="perf"></div>
+      <div class="broadcast"><span class="chan">Paramount+</span></div>
+    </div>
+
+    <div class="match-card liberta">
+      <div class="card-top">
+        <div class="match-top"><span class="kickoff">19:00</span><span class="comp-tag">Libertadores · Oitavas (volta)</span></div>
+        <div class="teams">
+          <div class="team"><div class="crest" style="background:#003DA5">COQ</div><div class="team-name">Coquimbo Unido</div></div>
+          <div class="vs">×</div>
+          <div class="team"><div class="crest" style="background:#7A1E1E">PLA</div><div class="team-name">Platense</div></div>
+        </div>
+      </div>
+      <div class="perf"></div>
+      <div class="broadcast"><span class="chan">Paramount+</span></div>
+    </div>
+
+    <div class="match-card liberta">
+      <div class="card-top">
+        <div class="match-top"><span class="kickoff">21:30</span><span class="comp-tag">Libertadores · Oitavas (volta)</span></div>
+        <div class="teams">
+          <div class="team"><div class="crest" style="background:#B01E28">FLA</div><div class="team-name">Flamengo</div></div>
+          <div class="vs">×</div>
+          <div class="team"><div class="crest" style="background:#003399">CRU</div><div class="team-name">Cruzeiro</div></div>
+        </div>
+      </div>
+      <div class="perf"></div>
+      <div class="broadcast"><span class="chan">Globo</span><span class="chan">Ge TV</span><span class="chan">Paramount+</span></div>
+    </div>
+
+  </section>
+
+  <section class="panel" id="panel-copabr">
+    <div class="empty">
+      <div class="ball">🏆</div>
+      <div class="big">Sem jogos da Copa do Brasil hoje</div>
+      <div class="small">Quartas de final começam <b>terça, 25/08</b>, com Cruzeiro × Atlético-MG. No dia seguinte: Vasco × Vitória e Palmeiras × Santos. Dia 27/08: Internacional × Grêmio.</div>
     </div>
   </section>
 
-  <section class="tabs-wrapper">
-    <div class="tabs-container">
-      <button class="tab-btn active" onclick="filterCategory('todos', this)"><span>🔥</span> Todos os Jogos</button>
-      <button class="tab-btn" onclick="filterCategory('libertadores', this)"><span>🏆</span> Libertadores</button>
-      <button class="tab-btn" onclick="filterCategory('sulamericana', this)"><span>⚽</span> Sul-Americana</button>
-      <button class="tab-btn" onclick="filterCategory('serie-b', this)"><span>🇧🇷</span> Série B</button>
-      <button class="tab-btn" onclick="filterCategory('champions', this)"><span>🇪🇺</span> Champions</button>
+  <section class="panel" id="panel-nba">
+    <div class="empty">
+      <div class="ball">🏀</div>
+      <div class="big">NBA em pré-temporada</div>
+      <div class="small">A temporada 2026-27 começa <b>terça, 20/10</b>, com Detroit Pistons × Boston Celtics abrindo a rodada.</div>
     </div>
   </section>
 
-  <main>
-    <div class="matches-grid" id="matches-grid"></div>
-  </main>
+  <div class="notice">
+    Dados de <b>19/08/2026</b> · fonte: ondeassistir.net.br · Horários e transmissões podem mudar. Confirme perto do jogo. App estático — não se atualiza sozinho.
+  </div>
+</div>
 
-  <footer>
-    <p>Agenda de Futebol & Transmissões • PWA Pronto para Instalação</p>
-  </footer>
-
-  <script>
-    // DADOS DOS JOGOS (Pode ser atualizado manualmente ou via API)
-    const matchesData = [
-      { id: 1, category: 'libertadores', leagueName: 'Copa Libertadores', tagClass: 'tag-libertadores', time: '19:00', homeTeam: 'Cerro Porteño', homeLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/3282.png', awayTeam: 'Palmeiras', awayLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/2029.png', channels: ['Paramount+'] },
-      { id: 2, category: 'libertadores', leagueName: 'Copa Libertadores', tagClass: 'tag-libertadores', time: '21:30', homeTeam: 'Flamengo', homeLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/819.png', awayTeam: 'Cruzeiro', awayLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/2022.png', channels: ['TV Globo', 'ge.globo', 'Paramount+'] },
-      { id: 3, category: 'sulamericana', leagueName: 'Copa Sul-Americana', tagClass: 'tag-sulamericana', time: '19:00', homeTeam: 'Atlético-MG', homeLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/816.png', awayTeam: 'RB Bragantino', awayLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/17154.png', channels: ['ESPN', 'Disney+'] },
-      { id: 4, category: 'sulamericana', leagueName: 'Copa Sul-Americana', tagClass: 'tag-sulamericana', time: '21:30', homeTeam: 'Santa Fe', homeLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/3421.png', awayTeam: 'River Plate', awayLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/16.png', channels: ['ESPN', 'Disney+'] },
-      { id: 5, category: 'serie-b', leagueName: 'Brasileirão Série B', tagClass: 'tag-serie-b', time: '19:30', homeTeam: 'Avaí', homeLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/6082.png', awayTeam: 'Sport', awayLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/2243.png', channels: ['Disney+'] },
-      { id: 6, category: 'serie-b', leagueName: 'Brasileirão Série B', tagClass: 'tag-serie-b', time: '20:30', homeTeam: 'Cuiabá', homeLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/18800.png', awayTeam: 'Operário-PR', awayLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/19519.png', channels: ['Disney+'] },
-      { id: 7, category: 'serie-b', leagueName: 'Brasileirão Série B', tagClass: 'tag-serie-b', time: '21:30', homeTeam: 'Botafogo-SP', homeLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/17855.png', awayTeam: 'Criciúma', awayLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/7754.png', channels: ['ESPN 4', 'Disney+'] },
-      { id: 8, category: 'champions', leagueName: 'Champions League', tagClass: 'tag-champions', time: '16:00', homeTeam: 'Celtic', homeLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/303.png', awayTeam: 'LASK Linz', awayLogo: 'https://a.espncdn.com/i/teamlogos/soccer/500/2099.png', channels: ['Space', 'Max'] }
-    ];
-
-    let currentCategory = 'todos';
-
-    // Data Atual
-    const options = { weekday: 'long', day: 'numeric', month: 'long' };
-    const todayFormatted = new Date().toLocaleDateString('pt-BR', options);
-    document.getElementById('current-date').innerText = todayFormatted.charAt(0).toUpperCase() + todayFormatted.slice(1);
-
-    // Renderização dos Jogos com Bypass de Hotlink e Fallback de Iniciais
-    function renderMatches() {
-      const container = document.getElementById('matches-grid');
-      const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
-      container.innerHTML = '';
-
-      let filtered = currentCategory === 'todos' 
-        ? matchesData 
-        : matchesData.filter(m => m.category === currentCategory);
-
-      if (searchTerm) {
-        filtered = filtered.filter(m => 
-          m.homeTeam.toLowerCase().includes(searchTerm) ||
-          m.awayTeam.toLowerCase().includes(searchTerm) ||
-          m.leagueName.toLowerCase().includes(searchTerm) ||
-          m.channels.some(c => c.toLowerCase().includes(searchTerm))
-        );
-      }
-
-      if (filtered.length === 0) {
-        container.innerHTML = `<div class="empty-state"><p>Nenhuma partida encontrada.</p></div>`;
-        return;
-      }
-
-      filtered.forEach(match => {
-        const channelsHTML = match.channels.map(c => `<span class="channel-tag">${c}</span>`).join('');
-        
-        // Iniciais para fallback
-        const homeInitials = match.homeTeam.substring(0, 2).toUpperCase();
-        const awayInitials = match.awayTeam.substring(0, 2).toUpperCase();
-
-        const card = document.createElement('div');
-        card.className = 'match-card';
-        card.innerHTML = `
-          <div>
-            <div class="card-top">
-              <span class="league-badge ${match.tagClass}">${match.leagueName}</span>
-              <span class="match-time-badge">🕒 ${match.time}</span>
-            </div>
-            <div class="teams-section">
-              <div class="team-col">
-                <div class="logo-wrapper">
-                  <img src="${match.homeLogo}" 
-                       alt="${match.homeTeam}" 
-                       class="team-logo" 
-                       referrerpolicy="no-referrer"
-                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                  <div class="team-avatar" style="display:none;">${homeInitials}</div>
-                </div>
-                <span class="team-name">${match.homeTeam}</span>
-              </div>
-              <div class="vs-text">VS</div>
-              <div class="team-col">
-                <div class="logo-wrapper">
-                  <img src="${match.awayLogo}" 
-                       alt="${match.awayTeam}" 
-                       class="team-logo" 
-                       referrerpolicy="no-referrer"
-                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                  <div class="team-avatar" style="display:none;">${awayInitials}</div>
-                </div>
-                <span class="team-name">${match.awayTeam}</span>
-              </div>
-            </div>
-          </div>
-          <div class="broadcast-box">
-            <span class="tv-label">📺 Onde assistir:</span>
-            <div class="channels-flex">${channelsHTML}</div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function filterCategory(category, element) {
-      currentCategory = category;
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      element.classList.add('active');
-      renderMatches();
-    }
-
-    function handleSearch() {
-      renderMatches();
-    }
-
-    renderMatches();
-
-    // Registro do Service Worker (PWA)
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js');
-      });
-    }
-
-    // Instalação PWA
-    let deferredPrompt;
-    const installBtn = document.getElementById('pwa-install-btn');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.style.display = 'block';
+<script>
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
     });
+  });
 
-    installBtn.addEventListener('click', () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => {
-          deferredPrompt = null;
-          installBtn.style.display = 'none';
-        });
-      }
-    });
-  </script>
+  if('serviceWorker' in navigator){
+    const swCode = `self.addEventListener('fetch', e=>{});`;
+    const blob = new Blob([swCode], {type:'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+  }
+</script>
+
 </body>
 </html>
