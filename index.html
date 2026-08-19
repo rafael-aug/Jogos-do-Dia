@@ -99,11 +99,19 @@
     margin-top:8px;
     letter-spacing:.03em;
   }
+  .updated-at{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    color:var(--ink-faint);
+    opacity:.7;
+    margin-top:5px;
+    letter-spacing:.02em;
+  }
 
   /* ===== Tabs ===== */
   nav.tabs{
     display:flex;
-    gap:2px;
+    gap:8px;
     padding:20px 0 18px;
     max-width:480px;
     margin:0 auto;
@@ -116,28 +124,28 @@
     flex:0 0 auto;
     min-width:78px;
     font-family:'Inter', sans-serif;
-    font-weight:600;
+    font-weight:700;
     font-size:12.5px;
     letter-spacing:.01em;
-    background:transparent;
-    color:var(--ink-faint);
+    background:#D6E8FB;
+    color:#0B3B66;
     border:none;
-    border-bottom:2px solid transparent;
-    padding:8px 12px 12px;
+    border-radius:9px;
+    padding:9px 13px 10px;
     cursor:pointer;
-    transition:color .15s ease, border-color .15s ease;
+    transition:background .15s ease, color .15s ease, transform .15s ease;
   }
   nav.tabs button:focus-visible{outline:2px solid var(--amber); outline-offset:2px; border-radius:4px;}
-  nav.tabs button.active{color:var(--ink); border-bottom-color:var(--amber);}
+  nav.tabs button.active{background:#0B3B66; color:#EAF3FF; transform:translateY(-1px);}
   .tab-count{
     display:block;
     font-family:'JetBrains Mono', monospace;
     font-size:10.5px;
-    color:var(--ink-faint);
+    color:#3E6E9E;
     margin-top:3px;
-    font-weight:500;
+    font-weight:600;
   }
-  nav.tabs button.active .tab-count{color:var(--amber);}
+  nav.tabs button.active .tab-count{color:#9CC4EF;}
 
   section.panel{display:none; padding-top:16px;}
   section.panel.active{display:block; animation:rise .35s ease both;}
@@ -339,6 +347,7 @@
   <div class="eyebrow"><span class="pulse"></span>Brasil · Horário de Brasília</div>
   <div class="board-date">QUA <span class="accent">19</span> AGO</div>
   <div class="board-sub">SÉRIE A · SÉRIE B · LIBERTADORES · COPA DO BRASIL · NBA</div>
+  <div class="updated-at">Atualizado em 19/08/2026 às 22:40</div>
 </header>
 
 <div class="wrap">
