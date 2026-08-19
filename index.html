@@ -308,6 +308,23 @@
       filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
     }
 
+    /* Escudo reserva elegante com iniciais caso a imagem falhe */
+    .team-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
     .team-name {
       font-size: 0.88rem;
       font-weight: 700;
@@ -434,7 +451,7 @@
     const todayFormatted = new Date().toLocaleDateString('pt-BR', options);
     document.getElementById('current-date').innerText = todayFormatted.charAt(0).toUpperCase() + todayFormatted.slice(1);
 
-    // Renderização dos Jogos
+    // Renderização dos Jogos com Bypass de Hotlink e Fallback de Iniciais
     function renderMatches() {
       const container = document.getElementById('matches-grid');
       const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
@@ -461,6 +478,10 @@
       filtered.forEach(match => {
         const channelsHTML = match.channels.map(c => `<span class="channel-tag">${c}</span>`).join('');
         
+        // Iniciais para fallback
+        const homeInitials = match.homeTeam.substring(0, 2).toUpperCase();
+        const awayInitials = match.awayTeam.substring(0, 2).toUpperCase();
+
         const card = document.createElement('div');
         card.className = 'match-card';
         card.innerHTML = `
@@ -472,14 +493,24 @@
             <div class="teams-section">
               <div class="team-col">
                 <div class="logo-wrapper">
-                  <img src="${match.homeLogo}" alt="${match.homeTeam}" class="team-logo" onerror="this.src='https://a.espncdn.com/i/teamlogos/default-team-logo.png';">
+                  <img src="${match.homeLogo}" 
+                       alt="${match.homeTeam}" 
+                       class="team-logo" 
+                       referrerpolicy="no-referrer"
+                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <div class="team-avatar" style="display:none;">${homeInitials}</div>
                 </div>
                 <span class="team-name">${match.homeTeam}</span>
               </div>
               <div class="vs-text">VS</div>
               <div class="team-col">
                 <div class="logo-wrapper">
-                  <img src="${match.awayLogo}" alt="${match.awayTeam}" class="team-logo" onerror="this.src='https://a.espncdn.com/i/teamlogos/default-team-logo.png';">
+                  <img src="${match.awayLogo}" 
+                       alt="${match.awayTeam}" 
+                       class="team-logo" 
+                       referrerpolicy="no-referrer"
+                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <div class="team-avatar" style="display:none;">${awayInitials}</div>
                 </div>
                 <span class="team-name">${match.awayTeam}</span>
               </div>
